@@ -34,8 +34,11 @@ class TimerViewModel {
     }
     
     func checkAndSetupInitialSession() {
-        if timerEngine.sessionState == .idle && timerEngine.timeRemaining == 0 {
-            timerEngine.setupNewSession(type: .focus, durationMinutes: settings.focusTimeMinutes)
+        if timerEngine.sessionState == .idle {
+            let currentFocusDuration = TimeInterval(settings.focusTimeMinutes * 60)
+            if timerEngine.totalDuration != currentFocusDuration || timerEngine.timeRemaining == 0 {
+                timerEngine.setupNewSession(type: .focus, durationMinutes: settings.focusTimeMinutes)
+            }
         }
     }
 }

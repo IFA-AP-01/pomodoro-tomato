@@ -3,42 +3,63 @@ import SwiftUI
 @Observable
 class SettingsService {
     var focusTimeMinutes: Int {
-        get { UserDefaults.standard.integer(forKey: "focusTimeMinutes") == 0 ? 25 : UserDefaults.standard.integer(forKey: "focusTimeMinutes") }
-        set { UserDefaults.standard.set(newValue, forKey: "focusTimeMinutes") }
+        didSet { UserDefaults.standard.set(focusTimeMinutes, forKey: "focusTimeMinutes") }
     }
     
     var shortBreakMinutes: Int {
-        get { UserDefaults.standard.integer(forKey: "shortBreakMinutes") == 0 ? 5 : UserDefaults.standard.integer(forKey: "shortBreakMinutes") }
-        set { UserDefaults.standard.set(newValue, forKey: "shortBreakMinutes") }
+        didSet { UserDefaults.standard.set(shortBreakMinutes, forKey: "shortBreakMinutes") }
     }
     
     var longBreakMinutes: Int {
-        get { UserDefaults.standard.integer(forKey: "longBreakMinutes") == 0 ? 15 : UserDefaults.standard.integer(forKey: "longBreakMinutes") }
-        set { UserDefaults.standard.set(newValue, forKey: "longBreakMinutes") }
+        didSet { UserDefaults.standard.set(longBreakMinutes, forKey: "longBreakMinutes") }
     }
     
     var cyclesBeforeLongBreak: Int {
-        get { UserDefaults.standard.integer(forKey: "cyclesBeforeLongBreak") == 0 ? 4 : UserDefaults.standard.integer(forKey: "cyclesBeforeLongBreak") }
-        set { UserDefaults.standard.set(newValue, forKey: "cyclesBeforeLongBreak") }
+        didSet { UserDefaults.standard.set(cyclesBeforeLongBreak, forKey: "cyclesBeforeLongBreak") }
     }
     
     var autoStartNext: Bool {
-        get { UserDefaults.standard.bool(forKey: "autoStartNext") }
-        set { UserDefaults.standard.set(newValue, forKey: "autoStartNext") }
-    }
-    
-    var forceDarkMode: Bool {
-        get { UserDefaults.standard.bool(forKey: "forceDarkMode") }
-        set { UserDefaults.standard.set(newValue, forKey: "forceDarkMode") }
+        didSet { UserDefaults.standard.set(autoStartNext, forKey: "autoStartNext") }
     }
     
     var dailyFocusGoalMinutes: Int {
-        get { UserDefaults.standard.integer(forKey: "dailyFocusGoalMinutes") == 0 ? 120 : UserDefaults.standard.integer(forKey: "dailyFocusGoalMinutes") }
-        set { UserDefaults.standard.set(newValue, forKey: "dailyFocusGoalMinutes") }
+        didSet { UserDefaults.standard.set(dailyFocusGoalMinutes, forKey: "dailyFocusGoalMinutes") }
     }
     
     var enableInAppAOD: Bool {
-        get { UserDefaults.standard.object(forKey: "enableInAppAOD") == nil ? true : UserDefaults.standard.bool(forKey: "enableInAppAOD") }
-        set { UserDefaults.standard.set(newValue, forKey: "enableInAppAOD") }
+        didSet { UserDefaults.standard.set(enableInAppAOD, forKey: "enableInAppAOD") }
+    }
+    
+    var selectedThemeID: String {
+        didSet { UserDefaults.standard.set(selectedThemeID, forKey: "selectedThemeID") }
+    }
+    
+    var currentTaskName: String {
+        didSet { UserDefaults.standard.set(currentTaskName, forKey: "currentTaskName") }
+    }
+    
+    var currentTaskTopic: String {
+        didSet { UserDefaults.standard.set(currentTaskTopic, forKey: "currentTaskTopic") }
+    }
+    
+    var currentTheme: PomodoroTheme {
+        PomodoroTheme.from(id: selectedThemeID)
+    }
+
+    init() {
+        // Load values from UserDefaults with defaults if not set
+        self.focusTimeMinutes = UserDefaults.standard.integer(forKey: "focusTimeMinutes") == 0 ? 25 : UserDefaults.standard.integer(forKey: "focusTimeMinutes")
+        self.shortBreakMinutes = UserDefaults.standard.integer(forKey: "shortBreakMinutes") == 0 ? 5 : UserDefaults.standard.integer(forKey: "shortBreakMinutes")
+        self.longBreakMinutes = UserDefaults.standard.integer(forKey: "longBreakMinutes") == 0 ? 15 : UserDefaults.standard.integer(forKey: "longBreakMinutes")
+        self.cyclesBeforeLongBreak = UserDefaults.standard.integer(forKey: "cyclesBeforeLongBreak") == 0 ? 4 : UserDefaults.standard.integer(forKey: "cyclesBeforeLongBreak")
+        self.autoStartNext = UserDefaults.standard.bool(forKey: "autoStartNext")
+        
+        let dailyGoal = UserDefaults.standard.integer(forKey: "dailyFocusGoalMinutes")
+        self.dailyFocusGoalMinutes = dailyGoal == 0 ? 120 : dailyGoal
+        
+        self.enableInAppAOD = UserDefaults.standard.object(forKey: "enableInAppAOD") == nil ? true : UserDefaults.standard.bool(forKey: "enableInAppAOD")
+        self.selectedThemeID = UserDefaults.standard.string(forKey: "selectedThemeID") ?? "default"
+        self.currentTaskName = UserDefaults.standard.string(forKey: "currentTaskName") ?? "Focus Time"
+        self.currentTaskTopic = UserDefaults.standard.string(forKey: "currentTaskTopic") ?? "General"
     }
 }

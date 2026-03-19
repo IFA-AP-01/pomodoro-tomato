@@ -10,18 +10,21 @@ struct TimerView: View {
     let timerForAOD = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     var body: some View {
+        let theme = viewModel.settings.currentTheme
+        
         ZStack {
             // Background
-            Color(UIColor.systemBackground).ignoresSafeArea()
+            theme.background.ignoresSafeArea()
             
-            VStack(spacing: 40) {
-                // Header (With AOD button)
+            VStack(spacing: 30) {
+                // Header (Title & AOD Button)
                 HStack {
                     Spacer()
-                    Text(viewModel.timerEngine.currentSessionType.rawValue)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(headerColor)
+                    Text(viewModel.timerEngine.currentSessionType.rawValue.uppercased())
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .kerning(1.5)
+                        .foregroundColor(theme.statusText)
+                        
                     Spacer()
                     if viewModel.settings.enableInAppAOD {
                         Button(action: {
@@ -29,63 +32,97 @@ struct TimerView: View {
                             UIApplication.shared.isIdleTimerDisabled = true
                         }) {
                             Image(systemName: "moon.stars.fill")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(theme.text.opacity(0.3))
                                 .font(.title3)
                         }
                     }
                 }
                 .padding(.horizontal)
+                .padding(.top, 10)
+                
+                // Dynamic Task Pill
+                HStack(spacing: 12) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(theme.cardText)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(viewModel.settings.currentTaskName)
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(theme.cardText)
+                        Text("Topic: \(viewModel.settings.currentTaskTopic)")
+                            .font(.system(size: 10, weight: .regular))
+                            .foregroundColor(theme.cardSecondaryText)
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.vertical, 14)
+                .background(theme.surface)
+                .clipShape(Capsule())
+                
+                Spacer()
                 
                 // Progress & Clock
                 ZStack {
                     // Background track
                     Circle()
-                        .stroke(lineWidth: 20)
-                        .opacity(0.1)
-                        .foregroundColor(.gray)
+                        .stroke(lineWidth: 30)
+                        .foregroundColor(theme.timerBackground)
                     
                     // Progress
-                    if viewModel.timerEngine.currentSessionType == .focus {
-                        Circle()
-                            .trim(from: 0.0, to: progress)
-                            .stroke(style: StrokeStyle(lineWidth: 20, lineCap: .round, lineJoin: .round))
-                            .foregroundColor(progressColor)
-                            .rotationEffect(Angle(degrees: 270.0))
-                            .animation(Animation.linear(duration: 0.1), value: progress)
-                    } else {
-                        WavyCircle(frequency: 20, amplitude: 5, progress: progress)
-                            .stroke(style: StrokeStyle(lineWidth: 15, lineCap: .round, lineJoin: .round))
-                            .foregroundColor(progressColor)
-                            .rotationEffect(Angle(degrees: 270.0))
-                            .animation(Animation.linear(duration: 0.1), value: progress)
-                    }
+                    Circle()
+                        .trim(from: 0.0, to: progress)
+                        .stroke(style: StrokeStyle(lineWidth: 30, lineCap: .round, lineJoin: .round))
+                        .foregroundColor(progressColor(for: theme))
+                        .rotationEffect(Angle(degrees: 270.0))
+                        .animation(.linear(duration: 0.1), value: progress)
                     
                     // Clock text
                     Text(timeString(from: viewModel.timerEngine.timeRemaining))
-                        .font(.system(size: 80, weight: .bold, design: .rounded))
+                        .font(.system(size: 64, weight: .bold, design: .rounded))
+                        .foregroundColor(theme.text)
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
                         .padding(40)
                 }
-                .padding(40)
+                .padding(.horizontal, 60)
                 
-                // Subtitle
-                Text(upNextText)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                Spacer()
+                
+                // Session Dots
+                HStack(spacing: 12) {
+                    ForEach(0..<viewModel.settings.cyclesBeforeLongBreak, id: \.self) { index in
+                        let completed = index < viewModel.timerEngine.completedCycles % viewModel.settings.cyclesBeforeLongBreak
+                        let isCurrent = index == viewModel.timerEngine.completedCycles % viewModel.settings.cyclesBeforeLongBreak
+                        
+                        if isCurrent && viewModel.timerEngine.currentSessionType == .focus {
+                            ZStack {
+                                Circle()
+                                    .fill(theme.accent)
+                                    .frame(width: 16, height: 16)
+                                Image(systemName: "plus")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(.black) // This is fine if accent is yellow
+                            }
+                        } else {
+                            Circle()
+                                .fill(completed ? theme.text.opacity(0.3) : theme.timerBackground)
+                                .frame(width: 12, height: 12)
+                        }
+                    }
+                }
+                
+                Spacer()
                 
                 // Controls
-                HStack(spacing: 30) {
+                HStack(spacing: 35) {
                     // Reset
                     Button(action: {
                         viewModel.reset()
                         triggerHaptic(style: .medium)
                     }) {
                         Image(systemName: "arrow.counterclockwise")
-                            .font(.title)
-                            .frame(width: 60, height: 60)
-                            .background(Color.secondary.opacity(0.2))
-                            .clipShape(Circle())
+                            .font(.title2)
+                            .foregroundColor(theme.text.opacity(0.3))
                     }
                     
                     // Play / Pause
@@ -95,10 +132,7 @@ struct TimerView: View {
                     }) {
                         Image(systemName: viewModel.timerEngine.sessionState == .running ? "pause.fill" : "play.fill")
                             .font(.system(size: 40))
-                            .foregroundColor(.white)
-                            .frame(width: 90, height: 90)
-                            .background(progressColor)
-                            .clipShape(Circle())
+                            .foregroundColor(theme.text)
                     }
                     
                     // Skip
@@ -107,14 +141,11 @@ struct TimerView: View {
                         triggerHaptic(style: .light)
                     }) {
                         Image(systemName: "forward.fill")
-                            .font(.title)
-                            .frame(width: 60, height: 60)
-                            .background(Color.secondary.opacity(0.2))
-                            .clipShape(Circle())
+                            .font(.title2)
+                            .foregroundColor(theme.text.opacity(0.3))
                     }
                 }
-                
-                Spacer()
+                .padding(.bottom, 130)
             }
             .padding()
             
@@ -124,19 +155,19 @@ struct TimerView: View {
                     Spacer()
                     HStack {
                         Text("Timer reset.")
-                            .foregroundColor(.white)
+                            .foregroundColor(theme.cardText)
                         Spacer()
                         Button("Undo") {
                             viewModel.performUndoReset()
                         }
                         .fontWeight(.bold)
-                        .foregroundColor(Color.accentColor)
+                        .foregroundColor(theme.accent)
                     }
                     .padding()
-                    .background(Color(UIColor.darkGray))
+                    .background(theme.surface)
                     .cornerRadius(10)
                     .padding(.horizontal)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 140)
                 }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .animation(.spring(), value: viewModel.timerEngine.isShowingUndoReset)
@@ -175,7 +206,6 @@ struct TimerView: View {
                 .transition(.opacity)
                 .zIndex(2)
                 .onReceive(timerForAOD) { _ in
-                    // Anti-burn-in shift (max 30 pts in any direction)
                     withAnimation(.easeInOut(duration: 2.0)) {
                         aodOffset = CGSize(
                             width: CGFloat.random(in: -30...30),
@@ -200,37 +230,12 @@ struct TimerView: View {
         return CGFloat(p)
     }
     
-    private var progressColor: Color {
+    private func progressColor(for theme: PomodoroTheme) -> Color {
         switch viewModel.timerEngine.currentSessionType {
-        case .focus: return .orange
-        case .shortBreak: return .green
+        case .focus: return theme.text
+        case .shortBreak: return theme.accent
         case .longBreak: return .blue
         }
-    }
-    
-    private var headerColor: Color {
-        progressColor
-    }
-    
-    private var upNextText: String {
-        // Calculate what's next based on cycles
-        let nextType: String
-        let nextDuration: Int
-        
-        if viewModel.timerEngine.currentSessionType == .focus {
-            if (viewModel.timerEngine.completedCycles + 1) % viewModel.settings.cyclesBeforeLongBreak == 0 {
-                nextType = "Long Break"
-                nextDuration = viewModel.settings.longBreakMinutes
-            } else {
-                nextType = "Short Break"
-                nextDuration = viewModel.settings.shortBreakMinutes
-            }
-        } else {
-            nextType = "Focus"
-            nextDuration = viewModel.settings.focusTimeMinutes
-        }
-        
-        return "Up Next: \(nextType) (\(nextDuration)m)"
     }
     
     func timeString(from timeInterval: TimeInterval) -> String {
