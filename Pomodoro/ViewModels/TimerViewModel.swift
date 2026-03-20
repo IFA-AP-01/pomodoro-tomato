@@ -4,6 +4,7 @@ import SwiftUI
 class TimerViewModel {
     var timerEngine: TimerEngine
     var settings: SettingsService
+    var isAODMode: Bool = false
     
     init(timerEngine: TimerEngine, settings: SettingsService) {
         self.timerEngine = timerEngine

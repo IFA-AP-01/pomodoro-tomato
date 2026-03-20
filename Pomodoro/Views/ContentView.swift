@@ -8,6 +8,7 @@ enum TabSelection {
 
 struct ContentView: View {
     @Environment(SettingsService.self) private var settingsService
+    @Environment(TimerViewModel.self) private var timerViewModel
     @State private var selectedTab: TabSelection = .timer
     
     var body: some View {
@@ -26,37 +27,40 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             // Custom Tab Bar
-            HStack(spacing: 15) {
-                TabBarButton(
-                    icon: "chart.bar.xaxis",
-                    title: "Dashboard",
-                    isSelected: selectedTab == .stats
-                ) {
-                    selectedTab = .stats
+            if !timerViewModel.isAODMode {
+                HStack(spacing: 15) {
+                    TabBarButton(
+                        icon: "chart.bar.xaxis",
+                        title: "Dashboard",
+                        isSelected: selectedTab == .stats
+                    ) {
+                        selectedTab = .stats
+                    }
+                    
+                    TabBarButton(
+                        icon: "timer",
+                        title: "Timer",
+                        isSelected: selectedTab == .timer
+                    ) {
+                        selectedTab = .timer
+                    }
+                    
+                    TabBarButton(
+                        icon: "gearshape.fill",
+                        title: "Settings",
+                        isSelected: selectedTab == .settings
+                    ) {
+                        selectedTab = .settings
+                    }
                 }
-                
-                TabBarButton(
-                    icon: "timer",
-                    title: "Timer",
-                    isSelected: selectedTab == .timer
-                ) {
-                    selectedTab = .timer
-                }
-                
-                TabBarButton(
-                    icon: "gearshape.fill",
-                    title: "Settings",
-                    isSelected: selectedTab == .settings
-                ) {
-                    selectedTab = .settings
-                }
+                .padding(.horizontal, 24)
+                .padding(.vertical, 14)
+                .background(settingsService.currentTheme.surface)
+                .clipShape(Capsule())
+                .shadow(color: .black.opacity(0.1), radius: 10, y: 5)
+                .padding(.bottom, 30) // Lifted slightly from bottom edge
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 14)
-            .background(settingsService.currentTheme.surface)
-            .clipShape(Capsule())
-            .shadow(color: .black.opacity(0.1), radius: 10, y: 5)
-            .padding(.bottom, 30) // Lifted slightly from bottom edge
         }
         .ignoresSafeArea(.keyboard)
     }
@@ -95,6 +99,9 @@ struct TabBarButton: View {
 }
 
 #Preview {
+    let settings = SettingsService()
+    let engine = TimerEngine()
     ContentView()
-        .environment(SettingsService())
+        .environment(settings)
+        .environment(TimerViewModel(timerEngine: engine, settings: settings))
 }
