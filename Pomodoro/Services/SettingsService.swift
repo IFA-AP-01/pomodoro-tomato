@@ -30,8 +30,20 @@ class SettingsService {
         didSet { UserDefaults.standard.set(enableInAppAOD, forKey: "enableInAppAOD") }
     }
     
-    var selectedThemeID: String {
-        didSet { UserDefaults.standard.set(selectedThemeID, forKey: "selectedThemeID") }
+    var themeMode: String {
+        didSet { UserDefaults.standard.set(themeMode, forKey: "themeMode") }
+    }
+    
+    var dynamicColor: Bool {
+        didSet { UserDefaults.standard.set(dynamicColor, forKey: "dynamicColor") }
+    }
+    
+    var colorScheme: String {
+        didSet { UserDefaults.standard.set(colorScheme, forKey: "colorScheme") }
+    }
+    
+    var blackTheme: Bool {
+        didSet { UserDefaults.standard.set(blackTheme, forKey: "blackTheme") }
     }
     
     var currentTaskName: String {
@@ -43,7 +55,28 @@ class SettingsService {
     }
     
     var currentTheme: PomodoroTheme {
-        PomodoroTheme.from(id: selectedThemeID)
+        return PomodoroTheme.generate(
+            mode: themeMode,
+            dynamicColor: dynamicColor,
+            colorScheme: colorSchemeStrungToColor(colorScheme),
+            blackTheme: blackTheme
+        )
+    }
+    
+    private func colorSchemeStrungToColor(_ name: String) -> Color {
+        // Return preset colors or a default
+        switch name {
+        case "pink": return Color.pink
+        case "purple": return Color.purple
+        case "blue": return Color.blue
+        case "cyan": return Color.cyan
+        case "mint": return Color.mint
+        case "green": return Color.green
+        case "yellow": return Color.yellow
+        case "orange": return Color.orange
+        case "red": return Color.red
+        default: return Color(red: 0.98, green: 0.82, blue: 0.22) // Default Tomato Yellow
+        }
     }
 
     init() {
@@ -58,7 +91,21 @@ class SettingsService {
         self.dailyFocusGoalMinutes = dailyGoal == 0 ? 120 : dailyGoal
         
         self.enableInAppAOD = UserDefaults.standard.object(forKey: "enableInAppAOD") == nil ? true : UserDefaults.standard.bool(forKey: "enableInAppAOD")
-        self.selectedThemeID = UserDefaults.standard.string(forKey: "selectedThemeID") ?? "default"
+        self.themeMode = UserDefaults.standard.object(forKey: "themeMode") as? String ?? "system"
+        self.dynamicColor = UserDefaults.standard.bool(forKey: "dynamicColor")
+        self.colorScheme = UserDefaults.standard.object(forKey: "colorScheme") as? String ?? "default"
+        self.blackTheme = UserDefaults.standard.bool(forKey: "blackTheme")
+        
+        // Migrate old selectedThemeID to themeMode if present
+        if let oldTheme = UserDefaults.standard.string(forKey: "selectedThemeID") {
+            if oldTheme == "dark" {
+                self.themeMode = "dark"
+            } else if oldTheme == "default" {
+                self.themeMode = "light"
+            }
+            UserDefaults.standard.removeObject(forKey: "selectedThemeID")
+        }
+        
         self.currentTaskName = UserDefaults.standard.string(forKey: "currentTaskName") ?? "Focus Time"
         self.currentTaskTopic = UserDefaults.standard.string(forKey: "currentTaskTopic") ?? "General"
     }

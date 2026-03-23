@@ -8,53 +8,56 @@ struct SettingsView: View {
         @Bindable var settings = viewModel.settingsService
         let theme = settings.currentTheme
         
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
-                VStack(alignment: .leading, spacing: 20) {
-                    sectionHeader("Focus Timer", theme: theme)
-                    cardContainer(theme: theme) { focusTimerCardContent }
-                    
-                    sectionHeader("Current Task", theme: theme)
-                    cardContainer(theme: theme) { taskCardContent }
-                    
-                    sectionHeader("Alerts & Automations", theme: theme)
-                    cardContainer(theme: theme) { alertsCardContent }
-                    
-                    sectionHeader("Appearance", theme: theme)
-                    cardContainer(theme: theme) { appearanceCardContent }
-                }
-                
-                VStack(spacing: 16) {
-                    Button(action: { viewModel.applySettingsChanges() }) {
-                        Text("Save Settings")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(theme.background)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 18)
-                            .background(theme.text)
-                            .cornerRadius(20)
+        NavigationStack {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 24) {
+                    VStack(alignment: .leading, spacing: 20) {
+                        sectionHeader("Focus Timer", theme: theme)
+                        cardContainer(theme: theme) { focusTimerCardContent }
+                        
+                        sectionHeader("Current Task", theme: theme)
+                        cardContainer(theme: theme) { taskCardContent }
+                        
+                        sectionHeader("Alerts & Automations", theme: theme)
+                        cardContainer(theme: theme) { alertsCardContent }
+                        
+                        sectionHeader("Appearance", theme: theme)
+                        cardContainer(theme: theme) { appearanceCardContent }
                     }
                     
-                    Button(action: { showingResetAlert = true }) {
-                        Text("HARD RESET")
-                            .font(.system(size: 10, weight: .bold))
-                            .tracking(1)
-                            .foregroundColor(.red)
+                    VStack(spacing: 16) {
+                        Button(action: { viewModel.applySettingsChanges() }) {
+                            Text("Save Settings")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white) // Using white since accent color is usually vibrant
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 18)
+                                .background(theme.accent)
+                                .cornerRadius(20)
+                        }
+                        
+                        Button(action: { showingResetAlert = true }) {
+                            Text("HARD RESET")
+                                .font(.system(size: 10, weight: .bold))
+                                .tracking(1)
+                                .foregroundColor(.red)
+                        }
+                        .padding(.top, 8)
                     }
-                    .padding(.top, 8)
+                    .padding(.top, 10)
+                    
+                    Color.clear.frame(height: 100)
                 }
-                .padding(.top, 10)
-                
-                Color.clear.frame(height: 100)
+                .padding(20)
             }
-            .padding(20)
-        }
-        .background(theme.background.ignoresSafeArea())
-        .alert("Hard Reset Timer?", isPresented: $showingResetAlert) {
-            Button("Reset", role: .destructive) { viewModel.forceResetTimer() }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("This will stop your current session and reset all progress.")
+            .background(theme.background.ignoresSafeArea())
+            .navigationBarHidden(true)
+            .alert("Hard Reset Timer?", isPresented: $showingResetAlert) {
+                Button("Reset", role: .destructive) { viewModel.forceResetTimer() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will stop your current session and reset all progress.")
+            }
         }
     }
     
@@ -205,35 +208,28 @@ struct SettingsView: View {
     private var appearanceCardContent: some View {
         @Bindable var settings = viewModel.settingsService
         let theme = settings.currentTheme
-        let isDark = settings.selectedThemeID == "dark"
         
-        return HStack(spacing: 0) {
-            Button(action: { settings.selectedThemeID = "default" }) {
-                appearanceButton(title: "LIGHT", icon: "sun.max.fill", isSelected: !isDark, theme: theme)
+        return NavigationLink(destination: AppearanceSettingsView()) {
+            HStack(spacing: 16) {
+                Image(systemName: "paintpalette.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(theme.accent)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Theme & Colors")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(theme.cardText)
+                    Text("Customize your app appearance")
+                        .font(.system(size: 13))
+                        .foregroundColor(theme.cardSecondaryText)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(theme.cardSecondaryText.opacity(0.5))
             }
-            Button(action: { settings.selectedThemeID = "dark" }) {
-                appearanceButton(title: "DARK", icon: "moon.fill", isSelected: isDark, theme: theme)
-            }
+            .padding(.vertical, 8)
         }
-        .padding(6)
-        .background(theme.cardElementBackground)
-        .cornerRadius(30)
-    }
-    
-    private func appearanceButton(title: String, icon: String, isSelected: Bool, theme: PomodoroTheme) -> some View {
-        VStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.system(size: 16))
-            Text(title)
-                .font(.system(size: 9, weight: .bold))
-                .tracking(1)
-        }
-        .foregroundColor(isSelected ? theme.accent : theme.cardSecondaryText)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 14)
-        .background(isSelected ? (theme.id == "dark" ? Color(white: 0.2) : .white) : Color.clear)
-        .cornerRadius(24)
-        .shadow(color: .black.opacity(isSelected && theme.id == "default" ? 0.1 : 0), radius: 4, y: 2)
+        .buttonStyle(.plain)
     }
 }
 

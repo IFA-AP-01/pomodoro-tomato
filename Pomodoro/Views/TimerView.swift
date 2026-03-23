@@ -95,14 +95,14 @@ struct TimerView: View {
                         let completed = index < viewModel.timerEngine.completedCycles % viewModel.settings.cyclesBeforeLongBreak
                         let isCurrent = index == viewModel.timerEngine.completedCycles % viewModel.settings.cyclesBeforeLongBreak
                         
-                        if isCurrent && viewModel.timerEngine.currentSessionType == .focus {
+                        if isCurrent {
                             ZStack {
                                 Circle()
                                     .fill(theme.accent)
                                     .frame(width: 16, height: 16)
                                 Image(systemName: "plus")
                                     .font(.system(size: 10, weight: .bold))
-                                    .foregroundColor(.black) // This is fine if accent is yellow
+                                    .foregroundColor(.white)
                             }
                         } else {
                             Circle()
@@ -397,9 +397,9 @@ struct TimerView: View {
     
     private func progressColor(for theme: PomodoroTheme) -> Color {
         switch viewModel.timerEngine.currentSessionType {
-        case .focus: return theme.text
-        case .shortBreak: return theme.accent
-        case .longBreak: return .blue
+        case .focus: return theme.accent
+        case .shortBreak: return theme.accent.opacity(0.7)
+        case .longBreak: return theme.accent.opacity(0.4)
         }
     }
     

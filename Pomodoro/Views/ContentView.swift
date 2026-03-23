@@ -91,7 +91,7 @@ struct TabBarButton: View {
             .padding(.vertical, 12)
             .padding(.horizontal, isSelected ? 20 : 12)
             .background(isSelected ? theme.background : Color.clear)
-            .foregroundColor(isSelected ? theme.tabActive : theme.tabInactive)
+            .foregroundColor(isSelected ? theme.accent : theme.tabInactive)
             .clipShape(Capsule())
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)

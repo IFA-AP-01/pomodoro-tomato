@@ -220,7 +220,7 @@ struct StatsView: View {
                     )
                     .interpolationMethod(isWavy ? .catmullRom : .linear)
                     .lineStyle(StrokeStyle(lineWidth: 3))
-                    .foregroundStyle(theme.cardText)
+                    .foregroundStyle(theme.accent)
                     
                     AreaMark(
                         x: .value("Day", item.label),
@@ -228,7 +228,7 @@ struct StatsView: View {
                     )
                     .interpolationMethod(isWavy ? .catmullRom : .linear)
                     .foregroundStyle(
-                        LinearGradient(colors: [theme.cardText.opacity(0.3), theme.cardText.opacity(0.0)], startPoint: .top, endPoint: .bottom)
+                        LinearGradient(colors: [theme.accent.opacity(0.4), theme.accent.opacity(0.0)], startPoint: .top, endPoint: .bottom)
                     )
                 }
             }
@@ -263,7 +263,7 @@ struct StatsView: View {
                         x: .value("Day", item.label),
                         y: .value("Value", item.value)
                     )
-                    .foregroundStyle(theme.cardText.opacity(0.8))
+                    .foregroundStyle(theme.accent)
                     .cornerRadius(2)
                 }
             }
