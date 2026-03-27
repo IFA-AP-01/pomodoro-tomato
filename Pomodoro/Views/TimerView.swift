@@ -20,165 +20,95 @@ struct TimerView: View {
             
             VStack(spacing: 30) {
                 // Header (Title & AOD Button)
-                HStack {
-                    Spacer()
-                    Text(viewModel.timerEngine.currentSessionType.rawValue.uppercased())
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .kerning(1.5)
-                        .foregroundColor(theme.statusText)
-                        
-                    Spacer()
-                    if viewModel.settings.enableInAppAOD {
-                        Button(action: {
-                            enterAODMode()
-                        }) {
-                            Image(systemName: "moon.stars.fill")
-                                .foregroundColor(theme.text.opacity(0.3))
-                                .font(.title3)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.top, 10)
+                TimerHeaderComponent(
+                    sessionType: viewModel.timerEngine.currentSessionType.rawValue,
+                    showAODButton: viewModel.settings.enableInAppAOD,
+                    theme: theme,
+                    onAODToggle: { enterAODMode() }
+                )
                 
                 // Dynamic Task Pill
-                HStack(spacing: 12) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(theme.cardText)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(viewModel.settings.currentTaskName)
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(theme.cardText)
-                        Text("Topic: \(viewModel.settings.currentTaskTopic)")
-                            .font(.system(size: 10, weight: .regular))
-                            .foregroundColor(theme.cardSecondaryText)
-                    }
-                }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 14)
-                .background(theme.surface)
-                .clipShape(Capsule())
+                TaskPillComponent(
+                    taskName: viewModel.settings.currentTaskName,
+                    taskTopic: viewModel.settings.currentTaskTopic,
+                    theme: theme
+                )
                 
                 Spacer()
                 
                 // Progress & Clock
-                ZStack {
-                    // Background track
-                    Circle()
-                        .stroke(lineWidth: 30)
-                        .foregroundColor(theme.timerBackground)
-                    
-                    // Progress
-                    Circle()
-                        .trim(from: 0.0, to: progress)
-                        .stroke(style: StrokeStyle(lineWidth: 30, lineCap: .round, lineJoin: .round))
-                        .foregroundColor(progressColor(for: theme))
-                        .rotationEffect(Angle(degrees: 270.0))
-                        .animation(.linear(duration: 0.1), value: progress)
-                    
-                    // Clock text
-                    Text(timeString(from: viewModel.timerEngine.timeRemaining))
-                        .font(.system(size: 64, weight: .bold, design: .rounded))
-                        .foregroundColor(theme.text)
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(1)
-                        .padding(40)
-                }
-                .padding(.horizontal, 60)
+                TimerRingComponent(
+                    progress: progress,
+                    timeString: timeString(from: viewModel.timerEngine.timeRemaining),
+                    progressColor: progressColor(for: theme),
+                    theme: theme
+                )
                 
                 Spacer()
                 
                 // Session Dots
-                HStack(spacing: 12) {
-                    ForEach(0..<viewModel.settings.cyclesBeforeLongBreak, id: \.self) { index in
-                        let completed = index < viewModel.timerEngine.completedCycles % viewModel.settings.cyclesBeforeLongBreak
-                        let isCurrent = index == viewModel.timerEngine.completedCycles % viewModel.settings.cyclesBeforeLongBreak
-                        
-                        if isCurrent {
-                            ZStack {
-                                Circle()
-                                    .fill(theme.accent)
-                                    .frame(width: 16, height: 16)
-                                Image(systemName: "plus")
-                                    .font(.system(size: 10, weight: .bold))
-                                    .foregroundColor(.white)
-                            }
-                        } else {
-                            Circle()
-                                .fill(completed ? theme.text.opacity(0.3) : theme.timerBackground)
-                                .frame(width: 12, height: 12)
-                        }
-                    }
-                }
+                SessionProgressComponent(
+                    cyclesBeforeLongBreak: viewModel.settings.cyclesBeforeLongBreak,
+                    completedCycles: viewModel.timerEngine.completedCycles,
+                    theme: theme
+                )
                 
                 Spacer()
                 
                 // Controls
-                HStack(spacing: 35) {
-                    // Reset
-                    Button(action: {
+                TimerControlsComponent(
+                    isRunning: viewModel.timerEngine.sessionState == .running,
+                    theme: theme,
+                    onReset: {
                         viewModel.reset()
                         triggerHaptic(style: .medium)
-                    }) {
-                        Image(systemName: "arrow.counterclockwise")
-                            .font(.title2)
-                            .foregroundColor(theme.text.opacity(0.3))
-                    }
-                    
-                    // Play / Pause
-                    Button(action: {
+                    },
+                    onTogglePlayPause: {
                         viewModel.togglePlayPause()
                         triggerHaptic(style: .heavy)
-                    }) {
-                        Image(systemName: viewModel.timerEngine.sessionState == .running ? "pause.fill" : "play.fill")
-                            .font(.system(size: 40))
-                            .foregroundColor(theme.text)
-                    }
-                    
-                    // Skip
-                    Button(action: {
+                    },
+                    onSkip: {
                         viewModel.skip()
                         triggerHaptic(style: .light)
-                    }) {
-                        Image(systemName: "forward.fill")
-                            .font(.title2)
-                            .foregroundColor(theme.text.opacity(0.3))
                     }
-                }
-                .padding(.bottom, 130)
+                )
             }
             .padding()
             
             // Undo Reset Snackbar
-            if viewModel.timerEngine.isShowingUndoReset {
-                VStack {
-                    Spacer()
-                    HStack {
-                        Text("Timer reset.")
-                            .foregroundColor(theme.cardText)
-                        Spacer()
-                        Button("Undo") {
-                            viewModel.performUndoReset()
-                        }
-                        .fontWeight(.bold)
-                        .foregroundColor(theme.accent)
-                    }
-                    .padding()
-                    .background(theme.surface)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-                    .padding(.bottom, 140)
-                }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .animation(.spring(), value: viewModel.timerEngine.isShowingUndoReset)
-            }
+            UndoSnackbarComponent(
+                isShowing: viewModel.timerEngine.isShowingUndoReset,
+                theme: theme,
+                onUndo: { viewModel.performUndoReset() }
+            )
+            .animation(.spring(), value: viewModel.timerEngine.isShowingUndoReset)
             
             // AOD Overlay
             if viewModel.isAODMode {
-                aodOverlayView
-                    .transition(.opacity)
-                    .zIndex(2)
+                AODOverlayComponent(
+                    currentTimeString: aodCurrentTimeString,
+                    currentDateString: aodCurrentDateString,
+                    progress: progress,
+                    timeRemainingString: timeString(from: viewModel.timerEngine.timeRemaining),
+                    sessionType: viewModel.timerEngine.currentSessionType.rawValue,
+                    batteryPercentage: batteryService.batteryPercentage,
+                    batteryIconName: batteryIconName,
+                    batteryIconColor: batteryIconColor,
+                    batteryStatusText: batteryStatusText,
+                    aodOffset: aodOffset,
+                    onExitAOD: { exitAODMode() }
+                )
+                .transition(.opacity)
+                .onReceive(timerForAOD) { _ in
+                    currentTime = Date()
+                    withAnimation(.easeInOut(duration: 2.0)) {
+                        aodOffset = CGSize(
+                            width: CGFloat.random(in: -15...15),
+                            height: CGFloat.random(in: -25...25)
+                        )
+                    }
+                }
+                .zIndex(2)
             }
         }
         .onAppear {
@@ -188,131 +118,7 @@ struct TimerView: View {
         }
     }
     
-    // MARK: - AOD Overlay View
-    
-    private var aodOverlayView: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                
-                Spacer()
-                    .frame(height: 80)
-                
-                // Current Time
-                Text(aodCurrentTimeString)
-                    .font(.system(size: 80, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .kerning(2)
-                
-                // Current Date
-                Text(aodCurrentDateString)
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundColor(.white.opacity(0.6))
-                    .padding(.top, 4)
-                
-                Spacer()
-                    .frame(height: 40)
-                
-                // Timer Ring
-                ZStack {
-                    // Background track
-                    Circle()
-                        .trim(from: 0.0, to: 0.75)
-                        .stroke(
-                            Color.white.opacity(0.15),
-                            style: StrokeStyle(lineWidth: 12, lineCap: .round)
-                        )
-                        .rotationEffect(.degrees(135))
-                        .frame(width: 160, height: 160)
-                    
-                    // Timer progress arc
-                    Circle()
-                        .trim(from: 0.0, to: progress * 0.75)
-                        .stroke(
-                            Color.white,
-                            style: StrokeStyle(lineWidth: 12, lineCap: .round)
-                        )
-                        .rotationEffect(.degrees(135))
-                        .frame(width: 160, height: 160)
-                        .animation(.linear(duration: 0.1), value: progress)
-                    
-                    // Timer countdown text
-                    Text(timeString(from: viewModel.timerEngine.timeRemaining))
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                }
-                
-                // Session type label
-                Text(viewModel.timerEngine.currentSessionType.rawValue)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.white.opacity(0.4))
-                    .padding(.top, 8)
-                
-                Spacer()
-                    .frame(height: 30)
-                
-                // Battery Info Row
-                HStack(spacing: 16) {
-                    // Battery icon + percentage
-                    HStack(spacing: 6) {
-                        Image(systemName: batteryIconName)
-                            .font(.system(size: 20))
-                            .foregroundColor(batteryIconColor)
-                        Text("\(batteryService.batteryPercentage)%")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.white)
-                    }
-                    
-                    // Separator
-                    Circle()
-                        .fill(Color.white.opacity(0.3))
-                        .frame(width: 4, height: 4)
-                    
-                    // Charging status
-                    Text(batteryStatusText)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.white.opacity(0.6))
-                }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                .background(
-                    Capsule()
-                        .fill(Color.white.opacity(0.08))
-                )
-                
-                Spacer()
-                
-                // AOD Exit Button
-                Button(action: {
-                    exitAODMode()
-                }) {
-                    Image(systemName: "moon.stars.fill")
-                        .font(.title2)
-                        .foregroundColor(.white.opacity(0.5))
-                        .padding(16)
-                        .background(
-                            Circle()
-                                .fill(Color.white.opacity(0.08))
-                        )
-                }
-                .padding(.bottom, 60)
-            }
-            .offset(aodOffset)
-        }
-        .onReceive(timerForAOD) { _ in
-            currentTime = Date()
-            withAnimation(.easeInOut(duration: 2.0)) {
-                aodOffset = CGSize(
-                    width: CGFloat.random(in: -15...15),
-                    height: CGFloat.random(in: -25...25)
-                )
-            }
-        }
-        .statusBarHidden(true)
-    }
-    
-    // MARK: - AOD Battery Helpers
+    // MARK: - AOD Helpers (Private logic remains in TimerView for now)
     
     private var batteryIconName: String {
         if batteryService.isCharging {
