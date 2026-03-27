@@ -113,6 +113,7 @@ struct TimerView: View {
         }
         .onAppear {
             viewModel.timerEngine.sessionRepository = LocalSessionRepository(modelContext: modelContext)
+            viewModel.timerEngine.settings = viewModel.settings
             viewModel.timerEngine.requestNotificationPermission()
             viewModel.checkAndSetupInitialSession()
         }

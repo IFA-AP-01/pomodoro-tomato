@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6CD87F632F76EADC00B89902 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD87F622F76EADC00B89902 /* WidgetKit.framework */; };
+		6CD87F652F76EADC00B89902 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD87F642F76EADC00B89902 /* SwiftUI.framework */; };
+		6CD87F762F76EADD00B89902 /* liveExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6CD87F602F76EADC00B89902 /* liveExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		6C963A512F6BE0EC0074DC6D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,13 +27,47 @@
 			remoteGlobalIDString = 6C963A402F6BE0EB0074DC6D;
 			remoteInfo = Pomodoro;
 		};
+		6CD87F742F76EADD00B89902 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6C963A392F6BE0EB0074DC6D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6CD87F5F2F76EADC00B89902;
+			remoteInfo = liveExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6CD87F7B2F76EADD00B89902 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				6CD87F762F76EADD00B89902 /* liveExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		6C963A412F6BE0EB0074DC6D /* Pomodoro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pomodoro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C963A502F6BE0EC0074DC6D /* PomodoroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PomodoroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C963A5A2F6BE0EC0074DC6D /* PomodoroUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PomodoroUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6CD87F602F76EADC00B89902 /* liveExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = liveExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		6CD87F622F76EADC00B89902 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		6CD87F642F76EADC00B89902 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6CD87F772F76EADD00B89902 /* Exceptions for "live" folder in "liveExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 6CD87F5F2F76EADC00B89902 /* liveExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6C963A432F6BE0EB0074DC6D /* Pomodoro */ = {
@@ -43,6 +83,14 @@
 		6C963A5D2F6BE0EC0074DC6D /* PomodoroUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PomodoroUITests;
+			sourceTree = "<group>";
+		};
+		6CD87F662F76EADC00B89902 /* live */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6CD87F772F76EADD00B89902 /* Exceptions for "live" folder in "liveExtension" target */,
+			);
+			path = live;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -69,6 +117,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6CD87F5D2F76EADC00B89902 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6CD87F652F76EADC00B89902 /* SwiftUI.framework in Frameworks */,
+				6CD87F632F76EADC00B89902 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -78,6 +135,8 @@
 				6C963A432F6BE0EB0074DC6D /* Pomodoro */,
 				6C963A532F6BE0EC0074DC6D /* PomodoroTests */,
 				6C963A5D2F6BE0EC0074DC6D /* PomodoroUITests */,
+				6CD87F662F76EADC00B89902 /* live */,
+				6CD87F612F76EADC00B89902 /* Frameworks */,
 				6C963A422F6BE0EB0074DC6D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,8 +147,18 @@
 				6C963A412F6BE0EB0074DC6D /* Pomodoro.app */,
 				6C963A502F6BE0EC0074DC6D /* PomodoroTests.xctest */,
 				6C963A5A2F6BE0EC0074DC6D /* PomodoroUITests.xctest */,
+				6CD87F602F76EADC00B89902 /* liveExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		6CD87F612F76EADC00B89902 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6CD87F622F76EADC00B89902 /* WidgetKit.framework */,
+				6CD87F642F76EADC00B89902 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -102,10 +171,12 @@
 				6C963A3D2F6BE0EB0074DC6D /* Sources */,
 				6C963A3E2F6BE0EB0074DC6D /* Frameworks */,
 				6C963A3F2F6BE0EB0074DC6D /* Resources */,
+				6CD87F7B2F76EADD00B89902 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				6CD87F752F76EADD00B89902 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				6C963A432F6BE0EB0074DC6D /* Pomodoro */,
@@ -163,6 +234,28 @@
 			productReference = 6C963A5A2F6BE0EC0074DC6D /* PomodoroUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		6CD87F5F2F76EADC00B89902 /* liveExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6CD87F782F76EADD00B89902 /* Build configuration list for PBXNativeTarget "liveExtension" */;
+			buildPhases = (
+				6CD87F5C2F76EADC00B89902 /* Sources */,
+				6CD87F5D2F76EADC00B89902 /* Frameworks */,
+				6CD87F5E2F76EADC00B89902 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				6CD87F662F76EADC00B89902 /* live */,
+			);
+			name = liveExtension;
+			packageProductDependencies = (
+			);
+			productName = liveExtension;
+			productReference = 6CD87F602F76EADC00B89902 /* liveExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -184,6 +277,9 @@
 						CreatedOnToolsVersion = 26.1;
 						TestTargetID = 6C963A402F6BE0EB0074DC6D;
 					};
+					6CD87F5F2F76EADC00B89902 = {
+						CreatedOnToolsVersion = 26.1;
+					};
 				};
 			};
 			buildConfigurationList = 6C963A3C2F6BE0EB0074DC6D /* Build configuration list for PBXProject "Pomodoro" */;
@@ -203,6 +299,7 @@
 				6C963A402F6BE0EB0074DC6D /* Pomodoro */,
 				6C963A4F2F6BE0EC0074DC6D /* PomodoroTests */,
 				6C963A592F6BE0EC0074DC6D /* PomodoroUITests */,
+				6CD87F5F2F76EADC00B89902 /* liveExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +320,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		6C963A582F6BE0EC0074DC6D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CD87F5E2F76EADC00B89902 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,6 +357,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6CD87F5C2F76EADC00B89902 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -265,6 +376,11 @@
 			isa = PBXTargetDependency;
 			target = 6C963A402F6BE0EB0074DC6D /* Pomodoro */;
 			targetProxy = 6C963A5B2F6BE0EC0074DC6D /* PBXContainerItemProxy */;
+		};
+		6CD87F752F76EADD00B89902 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6CD87F5F2F76EADC00B89902 /* liveExtension */;
+			targetProxy = 6CD87F742F76EADD00B89902 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -400,6 +516,7 @@
 				DEVELOPMENT_TEAM = 43W6X55RFR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -432,6 +549,7 @@
 				DEVELOPMENT_TEAM = 43W6X55RFR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -538,6 +656,66 @@
 			};
 			name = Release;
 		};
+		6CD87F792F76EADD00B89902 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 43W6X55RFR;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = live/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = live;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dotsdev.Pomodoro.live;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6CD87F7A2F76EADD00B89902 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 43W6X55RFR;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = live/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = live;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dotsdev.Pomodoro.live;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -573,6 +751,15 @@
 			buildConfigurations = (
 				6C963A6B2F6BE0EC0074DC6D /* Debug */,
 				6C963A6C2F6BE0EC0074DC6D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6CD87F782F76EADD00B89902 /* Build configuration list for PBXNativeTarget "liveExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6CD87F792F76EADD00B89902 /* Debug */,
+				6CD87F7A2F76EADD00B89902 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

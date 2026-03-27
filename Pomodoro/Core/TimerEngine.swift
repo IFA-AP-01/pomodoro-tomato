@@ -1,4 +1,6 @@
 import UserNotifications
+import ActivityKit
+import WidgetKit
 
 @Observable
 class TimerEngine {
@@ -11,6 +13,7 @@ class TimerEngine {
     var completedCycles: Int = 0 
     
     var sessionRepository: SessionRepositoryProtocol?
+    var settings: SettingsService?
     private var lastSaveTime: TimeInterval = 0
     
     // Core timing properties
@@ -21,6 +24,9 @@ class TimerEngine {
     // For Undo Reset feature
     var isShowingUndoReset: Bool = false
     private var undoCache: (Date?, TimeInterval, SessionState)?
+    
+    // Live Activity
+    private var currentActivity: Activity<PomodoroActivityAttributes>?
     
     enum SessionState {
         case idle     // Not started
@@ -52,6 +58,12 @@ class TimerEngine {
             sessionState = .running
             startTimerTicks()
             scheduleLocalNotification()
+            
+            if currentActivity == nil {
+                startLiveActivity()
+            } else {
+                updateLiveActivity()
+            }
         }
     }
     
@@ -65,6 +77,8 @@ class TimerEngine {
         
         timer?.invalidate()
         timer = nil
+        
+        updateLiveActivity()
     }
     
     func skip(settings: SettingsService) {
@@ -74,6 +88,8 @@ class TimerEngine {
         timer?.invalidate()
         timer = nil
         advanceToNextSession(settings: settings)
+        
+        updateLiveActivity()
     }
     
     func reset() {
@@ -89,9 +105,9 @@ class TimerEngine {
         timer?.invalidate()
         timer = nil
         timeRemaining = totalDuration
-        sessionState = .idle
-        timerStart = nil
         pauseTimeRemainingCache = nil
+        
+        endLiveActivity()
         
         // trigger snackbar
         isShowingUndoReset = true
@@ -117,6 +133,14 @@ class TimerEngine {
         
         undoCache = nil
         isShowingUndoReset = false
+        
+        if sessionState == .running {
+            if currentActivity == nil {
+                startLiveActivity()
+            } else {
+                updateLiveActivity()
+            }
+        }
     }
     
     func cancelUndo() {
@@ -162,6 +186,8 @@ class TimerEngine {
         timer?.invalidate()
         timer = nil
         sessionState = .finished
+        
+        updateLiveActivity()
         
         if currentSessionType == .focus {
             completedCycles += 1
@@ -225,6 +251,74 @@ class TimerEngine {
         
         if settings.autoStartNext {
             start()
+        }
+    }
+    
+    // MARK: - Live Activity Management
+    
+    private func startLiveActivity() {
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+        
+        let taskName = settings?.currentTaskName ?? "Nhiệm vụ hiện tại"
+        let cyclesGoal = settings?.cyclesBeforeLongBreak ?? 4
+        
+        let attributes = PomodoroActivityAttributes(taskName: taskName)
+        let targetDate = Date().addingTimeInterval(timeRemaining)
+        let state = PomodoroActivityAttributes.ContentState(
+            currentSessionType: currentSessionType.rawValue,
+            timeRemaining: timeRemaining,
+            totalDuration: totalDuration,
+            sessionState: "running",
+            targetDate: targetDate,
+            currentCycleIndex: completedCycles,
+            cyclesBeforeLongBreak: cyclesGoal
+        )
+        
+        do {
+            currentActivity = try Activity.request(attributes: attributes, content: .init(state: state, staleDate: nil))
+        } catch {
+            print("Error starting Live Activity: \(error.localizedDescription)")
+        }
+    }
+    
+    private func updateLiveActivity() {
+        guard let activity = currentActivity else { return }
+        
+        let cyclesGoal = settings?.cyclesBeforeLongBreak ?? 4
+        
+        let targetDate = Date().addingTimeInterval(timeRemaining)
+        let state = PomodoroActivityAttributes.ContentState(
+            currentSessionType: currentSessionType.rawValue,
+            timeRemaining: timeRemaining,
+            totalDuration: totalDuration,
+            sessionState: sessionStateString,
+            targetDate: targetDate,
+            currentCycleIndex: completedCycles,
+            cyclesBeforeLongBreak: cyclesGoal
+        )
+        
+        let content = ActivityContent(state: state, staleDate: nil)
+        
+        Task {
+            await activity.update(content)
+        }
+    }
+    
+    private func endLiveActivity() {
+        guard let activity = currentActivity else { return }
+        
+        Task {
+            await activity.end(nil, dismissalPolicy: .immediate)
+            self.currentActivity = nil
+        }
+    }
+    
+    private var sessionStateString: String {
+        switch sessionState {
+        case .running: return "running"
+        case .paused: return "paused"
+        case .finished: return "finished"
+        case .idle: return "idle"
         }
     }
 }
